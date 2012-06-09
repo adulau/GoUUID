@@ -8,9 +8,8 @@ package uuid
 
 import "crypto/rand"
 import "fmt"
-import "json"
-import "os"
 import "strings"
+import "encoding/json"
 
 // A universally unique identifier.
 type UUID [16]byte
@@ -27,7 +26,7 @@ func NewV4()(u *UUID){
 
 // Constructs a new V4 (random) UUID.  Error is returned
 // iff there is an error reading from the random source.
-func V4()(u *UUID, err os.Error){
+func V4()(u *UUID, err error){
   u = new(UUID)
   _, err = rand.Read(u[0:16])
   if err != nil { return }
@@ -45,12 +44,12 @@ func (u UUID)String()(string){
 
 // Marshal a UUID to a UUID string so as to
 // avoid byte-format marshalling.
-func (u *UUID)MarshalJSON()(buff []byte, err os.Error){
+func (u *UUID)MarshalJSON()(buff []byte, err error){
   return json.Marshal(u.String())
 }
 
 // Parse an UUID string from JSON.
-func (u *UUID)UnmarshalJSON(buff []byte)(err os.Error){
+func (u *UUID)UnmarshalJSON(buff []byte)(err error){
   ustr := ""
   err = json.Unmarshal(buff, &ustr)
   if err == nil { err = u.parse(ustr) }
@@ -58,7 +57,7 @@ func (u *UUID)UnmarshalJSON(buff []byte)(err os.Error){
 }
 
 // Parse an UUID string and return a new object.
-func Parse(s string)(u *UUID, err os.Error){
+func Parse(s string)(u *UUID, err error){
   u = new(UUID)
   u.parse(s)
   return
@@ -102,7 +101,7 @@ func hexValue(c byte)(byte){
   return 0xff
 }
 
-func (u *UUID)parse(s string)(err os.Error){
+func (u *UUID)parse(s string)(err error){
   if u == nil { u = new(UUID)}
   //fmt.Printf("UUID Unmarshal: [%s]\n", s)
   blks := strings.SplitN(s, "-", 5)
@@ -120,3 +119,4 @@ func (u *UUID)parse(s string)(err os.Error){
   //fmt.Printf("UUID Unmarshaled: [%s]\n", u.String())
   return
 }
+
